@@ -8,8 +8,8 @@ import { TestBed, async, inject } from '@angular/core/testing';
 
 import { AppModule } from '../../app/app.module';
 
-import { Http, BaseRequestOptions, Response, ResponseOptions, RequestOptions } from '@angular/http';
-
+import { BaseRequestOptions, Response, ResponseOptions, RequestOptions } from '@angular/http';
+import {HttpClient} from '@angular/common/http';
 import { MockBackend, MockConnection } from '@angular/http/testing';
 
 import { Observable } from 'rxjs/Observable';
@@ -60,11 +60,11 @@ describe('ProductDescription', () => {
       imports: [AppModule, RouterTestingModule.withRoutes([])],
       providers: [ProvidedService, MockBackend, BaseRequestOptions,
         {
-          provide: Http,
+          provide: HttpClient,
           useFactory: (mockBackend: MockBackend, defaultOptions: RequestOptions) => {
-            return new Http(mockBackend, defaultOptions);
+            return new HttpClient(mockBackend, defaultOptions);
           },
-          useClass: Http,
+          useClass: HttpClient,
           deps: [MockBackend, BaseRequestOptions]
         }
       ]
@@ -79,7 +79,7 @@ describe('ProductDescription', () => {
   it(`should use artist name data from the albumInfo property in the HTML template @product-description-html-uses-dynamic-albuminfo-band`, async(() => {
     since('The ProductService hasn\'t been created yet.').expect(productServiceExists).toBe(true);
     expect(productDescriptionComponentExists).toBe(true);
-    
+
     mock_backend.connections.subscribe((connection: MockConnection) => {
       let options = new ResponseOptions({
         body: json
@@ -101,11 +101,11 @@ describe('ProductDescription', () => {
       const parser = new DOMParser();
       const htmlDoc = parser.parseFromString(htmlString, 'text/xml');
       const re = /{{\s*albumInfo\?\.artist\s*}}/
-      since('We\'d like you to query the albumInfo property directly for the artist name, and we\'re not seeing that you\'re doing that.').expect(htmlDoc.querySelector('.band-name').textContent.match(re)).toEqual(jasmine.any(Array));  
+      since('We\'d like you to query the albumInfo property directly for the artist name, and we\'re not seeing that you\'re doing that.').expect(htmlDoc.querySelector('.band-name').textContent.match(re)).toEqual(jasmine.any(Array));
     } else {
       since('We\'d like you to query the albumInfo property directly for the artist name, and we\'re not seeing that you\'re doing that.').expect(0).toBe(1);
     }
-    
+
   }));
 
 });
